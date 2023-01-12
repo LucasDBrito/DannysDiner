@@ -83,9 +83,6 @@ Case Study Questions
 ---
 
 
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/3447)
-
-
 -- 2. How many days has each customer visited the restaurant?
 SELECT customer_id ,COUNT(DISTINCT order_date)
 FROM dannys_diner.sales
@@ -103,24 +100,19 @@ GROUP BY dannys_diner.sales.customer_id
 ---
 
 
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/3447)
-
 
 -- 3. What was the first item from the menu purchased by each customer?
 
-
-    WITH ordered_sales_cte AS
-    (
-       SELECT customer_id, order_date, product_name,
-          DENSE_RANK() OVER(PARTITION BY s.customer_id
-          ORDER BY s.order_date) AS rank
-       FROM dannys_diner.sales AS s
-       JOIN dannys_diner.menu AS m
-          ON s.product_id = m.product_id
-    )
+WITH first_purchased AS
+    (SELECT customer_id, order_date, product_name,
+     DENSE_RANK() OVER(PARTITION BY dannys_diner.sales.customer_id
+     ORDER BY dannys_diner.sales.order_date) AS rank
+     FROM dannys_diner.sales
+     JOIN dannys_diner.menu
+     ON dannys_diner.sales.product_id = dannys_diner.menu.product_id)
     
     SELECT customer_id, product_name
-    FROM ordered_sales_cte
+    FROM first_purchased
     WHERE rank = 1
     GROUP BY customer_id, product_name;
 
@@ -135,8 +127,6 @@ GROUP BY dannys_diner.sales.customer_id
 
 ---
 
-
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/3447)
 
 
 -- 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
@@ -159,7 +149,6 @@ GROUP BY dannys_diner.sales.customer_id
 ---
 
 
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/3447)
 
 
 -- 5. Which item was the most popular for each customer?
@@ -192,7 +181,7 @@ GROUP BY dannys_diner.sales.customer_id
 ---
 
 
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/3447)
+
 
 
 -- 6. Which item was purchased first by the customer after they became a member?
@@ -220,7 +209,6 @@ GROUP BY dannys_diner.sales.customer_id
 ---
 
 
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/3447)
 
 
 -- 7. Which item was purchased just before the customer became a member?
@@ -251,7 +239,7 @@ GROUP BY dannys_diner.sales.customer_id
 ---
 
 
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/3447)
+
 
 
 -- 8. What is the total items and amount spent for each member before they became a member?
@@ -277,7 +265,6 @@ GROUP BY dannys_diner.sales.customer_id
 ---
 
 
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/3447)
 
 
 -- 9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
@@ -306,8 +293,6 @@ GROUP BY dannys_diner.sales.customer_id
 
 ---
 
-
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/3447)
 
 
 -- 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
@@ -344,11 +329,11 @@ GROUP BY dannys_diner.sales.customer_id
 ---
 
 
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/3447)
 
 
-Bonus Questions
-Joining all tables:
+
+--Bonus Questions
+--Joining all tables:
 
 
     SELECT sales.customer_id, sales.order_date, menu.product_name, menu.price,
@@ -385,10 +370,9 @@ Joining all tables:
 ---
 
 
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/3447)
 
 
-⸻Ranking member purchases:
+--Ranking member purchases:
     WITH joint AS
     (SELECT sales.customer_id, sales.order_date, menu.product_name, menu.price,
     CASE WHEN order_date >= members.join_date THEN 'Y'
@@ -428,5 +412,3 @@ Joining all tables:
 
 ---
 
-
-[View on DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/3447)
